@@ -66,7 +66,7 @@ async def test_optional_fields_can_be_skipped(harness: BotHarness, sessionmaker:
 
 async def test_english_onboarding_keeps_russian_bot_name(harness: BotHarness) -> None:
     texts = await harness.send("/start", language_code="en")
-    assert "This is «Твой личный астролог»" in texts[0]
+    assert "This is «Твой личный астролог | Таро и гороскоп»" in texts[0]
     texts = await harness.press(LangCb(code="en").pack(), language_code="en")
     assert texts[0].startswith("What's your name?")
 

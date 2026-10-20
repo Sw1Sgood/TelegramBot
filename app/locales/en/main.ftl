@@ -1,7 +1,7 @@
 ## Onboarding
 
 start-greeting =
-    ✨ Hi! This is «{ $bot_name }» — your personal astrologer.
+    ✨ Hi! This is «{ $bot_name }» — your personal astrologer and tarot reader.
     I make tarot readings, horoscopes and numerology reports just for you, based on your birth date and our past readings.
 
     <i>All of this is for entertainment and self-reflection, not an exact prediction of the future.</i>

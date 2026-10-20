@@ -11,8 +11,8 @@ class Settings(BaseSettings):
 
     bot_token: SecretStr
     # Имя бота одно для всех языков интерфейса — на русском.
-    bot_name: str = "Твой личный астролог"
-    bot_username: str = ""
+    bot_name: str = "Твой личный астролог | Таро и гороскоп"
+    bot_username: str = "TaroAstrologiaGoroskopBot"
 
     run_mode: Literal["polling", "webhook"] = "polling"
     webhook_base_url: str = ""

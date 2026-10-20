@@ -34,8 +34,8 @@ def test_dynamic_keys_exist() -> None:
 
 
 def test_translator_formats_and_falls_back() -> None:
-    i18n = I18n(default_locale="ru", global_args={"bot_name": "Твой личный астролог"})
-    assert "«Твой личный астролог»" in i18n.translator("en")("start-greeting")
+    i18n = I18n(default_locale="ru", global_args={"bot_name": "Твой личный астролог | Таро и гороскоп"})
+    assert "«Твой личный астролог | Таро и гороскоп»" in i18n.translator("en")("start-greeting")
     assert "Анна" in i18n.translator("ru")("ask-birth-date", name="Анна")
     # Неизвестный язык — русский по умолчанию.
     assert i18n.translator("de").locale == "ru"
