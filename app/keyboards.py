@@ -1,4 +1,6 @@
 from aiogram.filters.callback_data import CallbackData
+from urllib.parse import quote
+
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
@@ -52,6 +54,10 @@ class DiaryCb(CallbackData, prefix="diary"):
 
 class HoroscopeCb(CallbackData, prefix="horo"):
     period: str  # day / week / month
+
+
+class SpreadCb(CallbackData, prefix="spread"):
+    kind: str
 
 
 def language_keyboard() -> InlineKeyboardMarkup:
@@ -127,10 +133,49 @@ def horoscope_keyboard(t: Translator, locked: tuple[str, ...]) -> InlineKeyboard
     return builder.as_markup()
 
 
+DIARY_ICONS = {"daily": "🃏", "question": "🔮", "compatibility": "💞", "dream": "🌙"}
+
+
+def spreads_keyboard(t: Translator, kinds: tuple[str, ...], locked: bool) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    for kind in kinds:
+        label = t(f"spread-btn-{kind}")
+        builder.button(text=f"{label} 🔒" if locked else label, callback_data=SpreadCb(kind=kind))
+    builder.button(text=t("btn-back-menu"), callback_data=MenuCb(section="main"))
+    builder.adjust(1)
+    return builder.as_markup()
+
+
+def locked_keyboard(t: Translator) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.button(text=t("menu-invite"), callback_data=MenuCb(section="invite"))
+    builder.button(text=t("btn-back-menu"), callback_data=MenuCb(section="main-new"))
+    builder.adjust(1)
+    return builder.as_markup()
+
+
+def numerology_keyboard(t: Translator) -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.button(text=t("num-btn-full"), callback_data=MenuCb(section="numerology-full"))
+    builder.button(text=t("btn-back-menu"), callback_data=MenuCb(section="main-new"))
+    builder.adjust(1)
+    return builder.as_markup()
+
+
+def invite_keyboard(t: Translator, link: str) -> InlineKeyboardMarkup:
+    share_url = f"https://t.me/share/url?url={quote(link)}&text={quote(t('invite-share-text'))}"
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text=t("invite-btn-share"), url=share_url)],
+            [InlineKeyboardButton(text=t("btn-back-menu"), callback_data=MenuCb(section="main-new").pack())],
+        ]
+    )
+
+
 def diary_keyboard(t: Translator, readings: list[Reading]) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     for reading in readings:
-        icon = "🃏" if reading.type == "daily" else "🔮"
+        icon = DIARY_ICONS.get(reading.type, "🌟")
         title = reading.question or t("diary-daily-card")
         if len(title) > 40:
             title = title[:39] + "…"

@@ -24,8 +24,41 @@ from app.services.tarot import DrawnCard
 logger = logging.getLogger(__name__)
 
 PROMPTS_DIR = Path(__file__).resolve().parent.parent / "prompts"
-QUESTION_POSITIONS = ("past", "present", "future")
 HISTORY_SIZE = 3
+
+
+@dataclass(frozen=True)
+class Spread:
+    kind: str
+    positions: tuple[str, ...]
+    advice_index: int  # карта, от которой даётся совет в готовых текстах
+    premium: bool
+
+
+SPREADS: dict[str, Spread] = {
+    "question": Spread("question", ("past", "present", "future"), 1, premium=False),
+    "yesno": Spread("yesno", ("answer",), 0, premium=True),
+    "two-paths": Spread("two-paths", ("path-a", "path-b", "advice"), 2, premium=True),
+    "relationship": Spread("relationship", ("you", "partner", "connection", "obstacle", "potential"), 4, premium=True),
+    "celtic": Spread(
+        "celtic",
+        ("situation", "challenge", "past", "future", "goal", "foundation", "self", "environment", "hopes", "outcome"),
+        6,
+        premium=True,
+    ),
+}
+BIG_SPREADS = ("celtic", "relationship", "yesno", "two-paths")
+
+# Карты, которые в раскладе «Да/Нет» в прямом положении означают «пока неясно».
+_UNCLEAR_CARDS = frozenset({"major_02", "major_10", "major_12", "major_18", "swords_02", "cups_07", "pentacles_02"})
+
+
+def yes_no_verdict(drawn: DrawnCard) -> str:
+    if drawn.is_reversed:
+        return "no"
+    if drawn.card.id in _UNCLEAR_CARDS:
+        return "maybe"
+    return "yes"
 
 _random = secrets.SystemRandom()
 
@@ -83,20 +116,18 @@ def template_daily(t: Translator, drawn: DrawnCard) -> str:
     )
 
 
-def template_question(t: Translator, user: User, question: str, cards: list[DrawnCard]) -> str:
-    parts = [
-        _question_header(t, question),
-        t("reading-intro", name=escape(user.name or "")),
-    ]
+def template_spread(t: Translator, user: User, spread: Spread, question: str, cards: list[DrawnCard]) -> str:
+    parts = [_spread_header(t, spread, question), t("reading-intro", name=escape(user.name or ""))]
+    if spread.kind == "yesno":
+        parts.append(f"<b>{t('yesno-verdict-' + yes_no_verdict(cards[0]))}</b>")
     for drawn in cards:
         parts.append(f"<b>{escape(card_label(t, drawn))}</b>\n{escape(drawn.card.meaning(t.locale, drawn.is_reversed))}")
-    # Совет — от карты настоящего: она про то, что можно сделать сейчас.
-    parts.append(f"<b>{t('advice-label')}</b> {escape(card_advice(t.locale, cards[1]))}")
+    parts.append(f"<b>{t('advice-label')}</b> {escape(card_advice(t.locale, cards[spread.advice_index]))}")
     return "\n\n".join(parts)
 
 
-def _question_header(t: Translator, question: str) -> str:
-    return f"<b>{t('reading-question-title')}</b>\n<i>«{escape(question)}»</i>"
+def _spread_header(t: Translator, spread: Spread, question: str) -> str:
+    return f"<b>{t('spread-title-' + spread.kind)}</b>\n<i>«{escape(question)}»</i>"
 
 
 # --- ИИ ---------------------------------------------------------------------------------------
@@ -174,10 +205,17 @@ class ReadingService:
         reading = await self._save(session, user, "daily", None, cards, text, tokens_in, tokens_out, cost)
         return ReadingResult(reading, cards, text, used_ai)
 
-    async def question(
-        self, session: AsyncSession, user: User, t: Translator, question: str, today: date, premium: bool
+    async def spread(
+        self,
+        session: AsyncSession,
+        user: User,
+        t: Translator,
+        spread: Spread,
+        question: str,
+        today: date,
+        premium: bool,
     ) -> ReadingResult:
-        cards = tarot.draw(3, QUESTION_POSITIONS)
+        cards = tarot.draw(len(spread.positions), spread.positions)
         text = None
         tokens_in = tokens_out = 0
         cost = 0
@@ -185,7 +223,7 @@ class ReadingService:
             history = await repo.recent_readings(session, user.id, HISTORY_SIZE)
             prompt = "\n\n".join(
                 [
-                    t("llm-question-task", date=today.strftime("%d.%m.%Y")),
+                    t(f"llm-task-{spread.kind}", date=today.strftime("%d.%m.%Y")),
                     _profile_block(t, user),
                     _history_block(t, history),
                     t("llm-question", question=question),
@@ -197,13 +235,27 @@ class ReadingService:
             except LLMUnavailable:
                 pass
             else:
-                text = f"{_question_header(t, question)}\n\n{escape(result.text)}"
+                text = f"{_spread_header(t, spread, question)}\n\n{escape(result.text)}"
                 tokens_in, tokens_out, cost = result.tokens_in, result.tokens_out, result.cost_usd
         used_ai = text is not None
         if text is None:
-            text = template_question(t, user, question, cards)
-        reading = await self._save(session, user, "question", question, cards, text, tokens_in, tokens_out, cost)
+            text = template_spread(t, user, spread, question, cards)
+        reading = await self._save(session, user, spread.kind, question, cards, text, tokens_in, tokens_out, cost)
         return ReadingResult(reading, cards, text, used_ai)
+
+    async def save_text_reading(
+        self,
+        session: AsyncSession,
+        user: User,
+        reading_type: str,
+        question: str | None,
+        text: str,
+        tokens_in: int = 0,
+        tokens_out: int = 0,
+        cost: object = 0,
+    ) -> Reading:
+        """Сохраняет в дневник разбор без карт (совместимость, сон)."""
+        return await self._save(session, user, reading_type, question, [], text, tokens_in, tokens_out, cost)
 
     async def _save(
         self,

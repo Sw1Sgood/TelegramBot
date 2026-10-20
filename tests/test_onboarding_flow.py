@@ -152,9 +152,12 @@ async def test_delete_me_removes_everything(harness: BotHarness, sessionmaker: a
     assert "Твой личный астролог" in texts[0]
 
 
-async def test_coming_soon_sections(harness: BotHarness) -> None:
+async def test_every_menu_section_is_implemented(harness: BotHarness) -> None:
+    from app.keyboards import MENU_SECTIONS
+
     await _onboard(harness)
-    harness.session.clear()
-    await harness.press(MenuCb(section="spreads").pack())
-    answers = [r for r in harness.session.requests if type(r).__name__ == "AnswerCallbackQuery"]
-    assert answers[0].text == "✨ Этот раздел появится совсем скоро!"
+    for section in MENU_SECTIONS:
+        harness.session.clear()
+        await harness.press(MenuCb(section=section).pack())
+        answers = harness.session.of_type("AnswerCallbackQuery")
+        assert all(a.text != "✨ Этот раздел появится совсем скоро!" for a in answers), section

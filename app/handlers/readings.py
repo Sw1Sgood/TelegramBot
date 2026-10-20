@@ -1,4 +1,5 @@
 import logging
+from dataclasses import dataclass
 
 from aiogram import Bot, F, Router
 from aiogram.fsm.context import FSMContext
@@ -10,14 +11,24 @@ from app.config import Settings
 from app.db import repo
 from app.db.models import Reading, User
 from app.filters import not_command
-from app.i18n import Translator
-from app.keyboards import DiaryCb, MenuCb, after_reading_keyboard, cancel_keyboard, diary_keyboard
+from app.i18n import I18n, Translator
+from app.keyboards import (
+    DiaryCb,
+    MenuCb,
+    SpreadCb,
+    after_reading_keyboard,
+    cancel_keyboard,
+    diary_keyboard,
+    locked_keyboard,
+    spreads_keyboard,
+)
 from app.services import tarot
 from app.services.access import is_premium
 from app.services.card_images import CardImages
 from app.services.limits import Limiter, local_today
 from app.services.llm import LLM
-from app.services.readings import ReadingService, card_label
+from app.services.readings import BIG_SPREADS, SPREADS, ReadingService, card_label
+from app.services.referrals import FRIEND_READING_BONUS, reward_for_first_reading
 from app.services.safety import is_crisis
 from app.services.tarot import DrawnCard
 from app.states import ReadingFlow
@@ -28,7 +39,68 @@ router = Router(name="readings")
 DIARY_SIZE = 10
 
 
+# --- Доступ: подписка, бесплатный лимит или бонусный расклад -----------------------------------
+
+
+@dataclass(frozen=True)
+class Charge:
+    premium: bool
+    via: str  # premium / free / credit
+
+
+async def charge(
+    session: AsyncSession, user: User, settings: Settings, limiter: Limiter, paid_feature: bool
+) -> Charge | str:
+    """Списывает одно использование. Возвращает Charge или ключ текста отказа."""
+    if await is_premium(session, user, settings):
+        if await limiter.try_consume(user.id, "premium", settings.premium_readings_per_day, user.timezone):
+            return Charge(True, "premium")
+        return "limit-premium"
+    if not paid_feature and await limiter.try_consume(user.id, "question", settings.free_questions_per_day, user.timezone):
+        return Charge(False, "free")
+    if await repo.consume_credit(session, user.id):
+        return Charge(False, "credit")
+    return "premium-locked-credit" if paid_feature else "limit-question-free"
+
+
+async def refund(session: AsyncSession, user: User, limiter: Limiter, spent: Charge) -> None:
+    if spent.via == "credit":
+        await repo.add_credits(session, user.id, 1)
+    else:
+        await limiter.refund(user.id, "premium" if spent.via == "premium" else "question", user.timezone)
+
+
+async def deny(message: Message, session: AsyncSession, user: User, t: Translator, reason: str) -> None:
+    await repo.log_event(session, user.id, "paywall_shown", {"reason": reason})
+    markup = locked_keyboard(t) if reason != "limit-premium" else after_reading_keyboard(t, new=False)
+    await message.answer(t(reason), reply_markup=markup)
+
+
+async def after_reading(
+    bot: Bot, session: AsyncSession, user: User, i18n: I18n, message: Message, t: Translator, spent: Charge
+) -> None:
+    """Бонус пригласившему и мягкое приглашение к подписке."""
+    referrer_id = await reward_for_first_reading(session, user)
+    if referrer_id is not None:
+        referrer = await repo.get_user(session, referrer_id)
+        friend_t = i18n.translator(referrer.language if referrer else None)
+        try:
+            await bot.send_message(referrer_id, friend_t("referral-rewarded", bonus=str(FRIEND_READING_BONUS)))
+        except Exception:  # пригласивший мог заблокировать бота
+            logger.info("Could not notify referrer %s", referrer_id)
+    if spent.via == "free":
+        await repo.log_event(session, user.id, "paywall_shown", {"reason": "after_free_reading"})
+        await message.answer(t("paywall-teaser"))
+    elif spent.via == "credit":
+        await message.answer(t("credit-spent", left=str(await repo.get_credits(session, user.id))))
+
+
+# --- Отправка ----------------------------------------------------------------------------------
+
+
 async def send_cards(bot: Bot, chat_id: int, cards: list[DrawnCard], t: Translator, images: CardImages) -> None:
+    if not cards:
+        return
     media = []
     for drawn in cards:
         source = await images.media(drawn)
@@ -52,7 +124,18 @@ async def send_reading(
     bot: Bot, chat_id: int, reading: Reading, text: str, t: Translator, images: CardImages
 ) -> None:
     await send_cards(bot, chat_id, tarot.from_json(reading.cards), t, images)
-    await bot.send_message(chat_id, text, reply_markup=after_reading_keyboard(t))
+    new = reading.type in SPREADS
+    await bot.send_message(chat_id, text, reply_markup=after_reading_keyboard(t, new=new))
+
+
+async def delete_quietly(bot: Bot, message: Message) -> None:
+    try:
+        await bot.delete_message(message.chat.id, message.message_id)
+    except Exception:  # сообщение могли уже удалить — это не важно
+        pass
+
+
+# --- Карта дня ---------------------------------------------------------------------------------
 
 
 async def deliver_daily_card(
@@ -74,7 +157,7 @@ async def deliver_daily_card(
     shuffling = await bot.send_message(chat_id, t("shuffling"))
     async with ChatActionSender.typing(bot=bot, chat_id=chat_id):
         result = await readings.daily_card(session, user, t, today, await is_premium(session, user, settings))
-    await _delete_quietly(bot, shuffling)
+    await delete_quietly(bot, shuffling)
     await send_reading(bot, chat_id, result.reading, result.text, t, images)
 
 
@@ -98,6 +181,16 @@ async def menu_daily_card(
     await deliver_daily_card(bot, callback.message.chat.id, session, user, t, settings, readings, card_images)
 
 
+# --- Расклады на вопрос и большие расклады ----------------------------------------------------
+
+
+async def _ask_question(callback: CallbackQuery, state: FSMContext, t: Translator, settings: Settings, kind: str) -> None:
+    await state.set_state(ReadingFlow.question)
+    await state.update_data(spread=kind)
+    key = "question-ask" if kind == "question" else f"spread-ask-{kind}"
+    await callback.message.answer(t(key, max=str(settings.question_max_length)), reply_markup=cancel_keyboard(t))
+
+
 @router.callback_query(MenuCb.filter(F.section == "question"))
 async def menu_question(
     callback: CallbackQuery, state: FSMContext, user: User | None, t: Translator, settings: Settings
@@ -106,14 +199,46 @@ async def menu_question(
         await callback.answer(t("need-onboarding"), show_alert=True)
         return
     await callback.answer()
-    await state.set_state(ReadingFlow.question)
-    await callback.message.answer(
-        t("question-ask", max=str(settings.question_max_length)), reply_markup=cancel_keyboard(t)
-    )
+    await _ask_question(callback, state, t, settings, "question")
 
 
-@router.callback_query(ReadingFlow.question, MenuCb.filter(F.section == "cancel"))
-async def question_cancel(callback: CallbackQuery, state: FSMContext, t: Translator) -> None:
+@router.callback_query(MenuCb.filter(F.section == "spreads"))
+async def menu_spreads(
+    callback: CallbackQuery,
+    state: FSMContext,
+    session: AsyncSession,
+    user: User | None,
+    t: Translator,
+    settings: Settings,
+) -> None:
+    await state.clear()
+    if user is None or not user.is_onboarded:
+        await callback.answer(t("need-onboarding"), show_alert=True)
+        return
+    await callback.answer()
+    unlocked = await is_premium(session, user, settings) or await repo.get_credits(session, user.id) > 0
+    await callback.message.answer(t("spreads-title"), reply_markup=spreads_keyboard(t, BIG_SPREADS, locked=not unlocked))
+
+
+@router.callback_query(SpreadCb.filter())
+async def choose_spread(
+    callback: CallbackQuery,
+    callback_data: SpreadCb,
+    state: FSMContext,
+    user: User | None,
+    t: Translator,
+    settings: Settings,
+) -> None:
+    if user is None or not user.is_onboarded or callback_data.kind not in BIG_SPREADS:
+        await callback.answer()
+        return
+    await callback.answer()
+    # Доступ проверяется после ввода вопроса — тогда же списывается расклад.
+    await _ask_question(callback, state, t, settings, callback_data.kind)
+
+
+@router.callback_query(MenuCb.filter(F.section == "cancel"))
+async def flow_cancel(callback: CallbackQuery, state: FSMContext, t: Translator) -> None:
     await state.clear()
     await callback.answer()
     await callback.message.edit_text(t("edit-cancelled"))
@@ -127,6 +252,7 @@ async def question_text(
     session: AsyncSession,
     user: User | None,
     t: Translator,
+    i18n: I18n,
     settings: Settings,
     readings: ReadingService,
     limiter: Limiter,
@@ -137,6 +263,7 @@ async def question_text(
         await state.clear()
         await message.answer(t("need-onboarding"))
         return
+    spread = SPREADS.get((await state.get_data()).get("spread", "question"), SPREADS["question"])
     question = " ".join(message.text.split())
     if len(question) > settings.question_max_length:
         await message.answer(t("question-too-long", max=str(settings.question_max_length)))
@@ -150,37 +277,37 @@ async def question_text(
         await message.answer(t("rate-limited"))
         return
 
-    premium = await is_premium(session, user, settings)
-    limit = settings.premium_readings_per_day if premium else settings.free_questions_per_day
-    if not await limiter.try_consume(user.id, "question", limit, user.timezone):
-        await state.clear()
-        await repo.log_event(session, user.id, "paywall_shown", {"reason": "question_limit"})
-        await message.answer(t("limit-premium" if premium else "limit-question-free"), reply_markup=after_reading_keyboard(t, new=False))
+    spent = await charge(session, user, settings, limiter, paid_feature=spread.premium)
+    await state.clear()
+    if isinstance(spent, str):
+        await deny(message, session, user, t, spent)
         return
 
-    await state.clear()
     if llm.is_busy:
         await message.answer(t("queue-notice"))
     shuffling = await message.answer(t("shuffling"))
     try:
         async with ChatActionSender.typing(bot=bot, chat_id=message.chat.id):
-            result = await readings.question(session, user, t, question, local_today(user.timezone), premium)
+            result = await readings.spread(
+                session, user, t, spread, question, local_today(user.timezone), spent.premium
+            )
     except Exception:
         logger.exception("Reading failed")
-        await limiter.refund(user.id, "question", user.timezone)
-        await _delete_quietly(bot, shuffling)
+        await refund(session, user, limiter, spent)
+        await delete_quietly(bot, shuffling)
         await message.answer(t("reading-error"))
         return
-    await _delete_quietly(bot, shuffling)
+    await delete_quietly(bot, shuffling)
     await send_reading(bot, message.chat.id, result.reading, result.text, t, card_images)
-    if not premium:
-        await repo.log_event(session, user.id, "paywall_shown", {"reason": "after_free_reading"})
-        await message.answer(t("paywall-teaser"))
+    await after_reading(bot, session, user, i18n, message, t, spent)
 
 
 @router.message(ReadingFlow.question, not_command)
 async def question_non_text(message: Message, t: Translator) -> None:
     await message.answer(t("error-text-expected"))
+
+
+# --- Дневник -----------------------------------------------------------------------------------
 
 
 @router.callback_query(MenuCb.filter(F.section == "diary"))
@@ -216,10 +343,3 @@ async def diary_open(
     if reading is None:
         return
     await send_reading(bot, callback.message.chat.id, reading, reading.response_text or "", t, card_images)
-
-
-async def _delete_quietly(bot: Bot, message: Message) -> None:
-    try:
-        await bot.delete_message(message.chat.id, message.message_id)
-    except Exception:  # сообщение могли уже удалить — это не важно
-        pass

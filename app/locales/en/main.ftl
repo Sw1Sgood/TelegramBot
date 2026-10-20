@@ -47,7 +47,6 @@ position-future = Future
 daily-card-title = <b>🃏 Card of the Day — { $card }</b>
 daily-advice-label = ✨ Advice for today:
 daily-card-again = Today's card has already been drawn — here it is. A new one will be waiting for you tomorrow 🌅
-reading-question-title = 🔮 Question reading
 reading-intro = { $name }, here is what the cards show.
 advice-label = ✨ Advice:
 
@@ -65,7 +64,7 @@ reading-error = Sorry, I couldn't make the reading 🙏 It wasn't counted — pl
 limit-question-free =
     You've already had today's free reading 🌙
 
-    A new one will be waiting for you tomorrow. And very soon there will be a subscription with unlimited readings, weekly and monthly horoscopes and big spreads.
+    A new one will be waiting for you tomorrow. Don't want to wait? Invite a friend: for each one who makes a reading, you get 3 bonus readings 🎁 A subscription with unlimited readings is coming very soon too.
 limit-premium = That's enough readings for today — the cards need rest too 🌙 Come back tomorrow.
 paywall-teaser = 💫 Want to go deeper? A subscription is coming soon: unlimited readings, the Celtic Cross, compatibility and weekly and monthly horoscopes.
 premium-locked = 🔒 This section will be available with a subscription — coming very soon ✨
@@ -79,6 +78,122 @@ crisis-response =
     • Find a free helpline in your country at findahelpline.com.
 
     You're not alone, and talking to someone is the right step.
+
+## Big spreads
+
+spreads-title =
+    🌟 Big spreads — for questions you want to explore in depth.
+
+    • <b>Celtic Cross</b> — 10 cards, a detailed look at the situation
+    • <b>Relationship</b> — 5 cards about the two of you
+    • <b>Yes or no</b> — a short answer to a clear question
+    • <b>Two paths</b> — what awaits on each option
+spread-btn-celtic = ✝️ Celtic Cross (10 cards)
+spread-btn-relationship = 💞 Relationship (5 cards)
+spread-btn-yesno = ⚖️ Yes or no (1 card)
+spread-btn-two-paths = 🔀 Two paths (3 cards)
+spread-title-question = 🔮 Question reading
+spread-title-celtic = ✝️ Celtic Cross
+spread-title-relationship = 💞 Relationship reading
+spread-title-yesno = ⚖️ Yes or no
+spread-title-two-paths = 🔀 Two paths
+spread-ask-celtic = ✝️ The Celtic Cross looks at a situation in depth. Describe it or ask a question in one message (up to { $max } characters).
+spread-ask-relationship = 💞 Tell me which relationship you'd like to explore — for example: "What's going on between me and Alex?" (up to { $max } characters).
+spread-ask-yesno = ⚖️ Ask a question that can be answered "yes" or "no" — for example: "Should I go to this meeting?" (up to { $max } characters).
+spread-ask-two-paths = 🔀 Describe the two options you're choosing between — for example: "Stay at my current job or move to a new company?" (up to { $max } characters).
+yesno-verdict-yes = ✅ Most likely yes
+yesno-verdict-no = ❌ Most likely no
+yesno-verdict-maybe = 🌫 Unclear for now — the answer is still forming
+position-answer = Answer
+position-path-a = First path
+position-path-b = Second path
+position-advice = The cards' advice
+position-you = You
+position-partner = Partner
+position-connection = What connects you
+position-obstacle = What stands in the way
+position-potential = The relationship's potential
+position-situation = Situation
+position-challenge = Challenge
+position-goal = Goal
+position-foundation = Foundation
+position-self = Yourself
+position-environment = Environment
+position-hopes = Hopes and fears
+position-outcome = Outcome
+
+premium-locked-credit =
+    🔒 This section is available with a subscription or for a bonus reading.
+
+    The subscription is coming very soon, and you can get bonus readings right now: invite a friend — for each one who makes a reading, you get 3 bonuses 🎁
+credit-spent = 🎁 A bonus reading was used. Left: { $left }
+referral-rewarded = 🎁 Your friend made their first reading — you've received { $bonus } bonus readings! You can spend them on any section.
+
+## Compatibility
+
+compat-title = 💞 Compatibility
+compat-ask = 💞 Send your partner's date of birth as <b>DD.MM.YYYY</b> — I'll compare your zodiac signs and life path numbers.
+compat-people =
+    You: { $you } · life path { $you_lp }
+    Partner: { $partner } · life path { $partner_lp }
+compat-score = Compatibility: { $score }%
+compat-elements-label = Elements:
+compat-numbers-label = Numbers:
+compat-pair-fire-fire = Two fires — a bright, passionate couple. You energise each other, but remember to give way instead of competing.
+compat-pair-earth-earth = Two earths — reliability and shared values. Planning and daily life come easily; add a little spontaneity.
+compat-pair-air-air = Two airs — lightness, conversation and shared interests. You always have something to talk about; don't forget emotional depth.
+compat-pair-water-water = Two waters — deep emotional understanding. You feel each other without words; protect your personal boundaries.
+compat-pair-air-fire = Air fans the fire — an inspiring union. You push each other toward new things and are rarely bored together.
+compat-pair-earth-water = Water nourishes earth — a harmonious, caring union. One gives stability, the other warmth and sensitivity.
+compat-pair-earth-fire = Fire and earth — energy meets stability. If you agree on the pace, you'll complement each other.
+compat-pair-air-water = Air and water — mind and feelings. Learn each other's language: one needs to talk, the other to feel.
+compat-pair-fire-water = Fire and water — opposites attract. The relationship can be very strong if you respect your differences.
+compat-pair-air-earth = Air and earth — dreams and practicality. Together you can bring ideas to life if you find a shared rhythm.
+compat-numbers-harmonious = Your life path numbers are in the same group — you share a similar rhythm and view of what matters.
+compat-numbers-different = Your life path numbers are in different groups — you see life differently, and that can enrich you both.
+compat-advice-high = Cherish what you have: talk about your feelings and make time just for the two of you.
+compat-advice-mid = Your differences aren't a barrier but a resource. Discuss expectations honestly and gently.
+compat-advice-low = You'll need more patience and conversation, but strong couples are born exactly from learning to understand each other.
+
+## Numerology
+
+num-title = 🔢 Numerology portrait: { $name }
+num-life-path = Life path number — { $number }
+num-birthday = Birthday number — { $number }
+num-personal-year = Personal year { $year } — { $number }
+num-year-prefix = This year is
+num-expression = Destiny number (by name) — { $number }
+num-soul = Soul number — { $number }
+num-personality = Personality number — { $number }
+num-full-teaser = 🔒 The full name reading — destiny, soul and personality numbers — is available with a subscription or for a bonus reading.
+num-btn-full = 🔓 Full name reading
+
+## Dreams
+
+dream-title = 🌙 Dream interpretation
+dream-ask = 🌙 Describe your dream in one message (up to { $max } characters): what happened, who was there, how you felt.
+dream-too-long = Your description is a bit long — please shorten it to { $max } characters.
+dream-thinking = 🌙 Looking into your dream…
+dream-text-only = For now I can only read dreams as text — please describe it in words 🙏
+dream-intro = Here are the symbols I see in your dream:
+dream-generic = Dreams speak to us in the language of feelings. Remember the mood in the dream and after waking up: it will hint at what the dream is about — a worry, a desire, or changes already beginning in your life.
+dream-advice = Write down the dream and how you felt — reread it in a few days: the meaning often becomes clearer with time.
+
+## Invite a friend
+
+invite-text =
+    🎁 <b>Invite friends — get bonus readings</b>
+
+    For every friend who makes their first reading, you get { $bonus } bonus readings. Spend them on big spreads, compatibility, dream interpretation and the full numerology reading.
+
+    Your link:
+    { $link }
+
+    Friends joined: { $invited }
+    Made a reading: { $rewarded }
+    Bonus readings available: { $credits }
+invite-btn-share = 📤 Share the link
+invite-share-text = Try "Твой личный астролог" — tarot readings and horoscopes by your birth date ✨
 
 ## Diary
 
@@ -141,9 +256,23 @@ llm-history =
     { $items }
 llm-reading-type-daily = Card of the Day
 llm-reading-type-question = question reading
+llm-reading-type-yesno = yes-or-no reading
+llm-reading-type-two-paths = two-paths reading
+llm-reading-type-relationship = relationship reading
+llm-reading-type-celtic = Celtic Cross
+llm-reading-type-compatibility = compatibility
+llm-reading-type-dream = dream interpretation
+llm-task-question = Today is { $date }. Make a three-card reading for the question: past, present, future.
+llm-task-yesno = Today is { $date }. A one-card yes-or-no reading. Start with the answer: "Most likely yes", "Most likely no" or "Unclear for now", then explain it through the card. Length: 100–180 words.
+llm-task-two-paths = Today is { $date }. A two-paths reading: the first card shows what awaits on the first path, the second on the second path, the third is advice. Help the person weigh the options, but leave the decision to them.
+llm-task-relationship = Today is { $date }. A five-card relationship reading: you, partner, what connects you, what stands in the way, the relationship's potential. Up to 350 words.
+llm-task-celtic = Today is { $date }. A ten-card Celtic Cross reading. Describe each position briefly in 1–2 sentences and bring it all together in a conclusion. Up to 450 words.
+llm-compat-task = Describe the couple's compatibility. First person ({ $name }): sign { $you }, life path number { $you_lp }. Partner: sign { $partner }, life path number { $partner_lp }. Calculated compatibility: { $score }%.
+llm-dream-task =
+    The person's name: { $name }
+    Dream: "{ $dream }"
 llm-base-meaning = Base meaning
 llm-question = The person's question: "{ $question }"
-llm-question-task = Today is { $date }. Make a three-card reading for the question: past, present, future.
 llm-daily-task = Today is { $date }. This is the Card of the Day — one card for today. Write 60–120 words: what this card means for the person's day, ending with a paragraph starting "Advice:" with one short piece of advice. Don't repeat the card name at the start — it's already shown.
 llm-horoscope-task = Write a horoscope for { $sign } for { $period } ({ $start } – { $end }).
 llm-period-day = today

@@ -1,7 +1,7 @@
 from aiogram import Router
 from aiogram.types import CallbackQuery
 
-from app.handlers import account, horoscope, menu, profile, readings, start
+from app.handlers import account, horoscope, insights, menu, profile, readings, start
 
 fallback_router = Router(name="fallback")
 
@@ -17,6 +17,13 @@ def setup_routers() -> Router:
     # Порядок важен: онбординг и редактирование профиля (FSM) раньше общих хэндлеров,
     # разделы меню раньше заглушки «скоро», fallback — последним.
     root.include_routers(
-        start.router, profile.router, readings.router, horoscope.router, account.router, menu.router, fallback_router
+        start.router,
+        profile.router,
+        readings.router,
+        horoscope.router,
+        insights.router,
+        account.router,
+        menu.router,
+        fallback_router,
     )
     return root

@@ -15,3 +15,8 @@ class ProfileEdit(StatesGroup):
 
 class ReadingFlow(StatesGroup):
     question = State()
+
+
+class InsightFlow(StatesGroup):
+    partner_date = State()
+    dream = State()

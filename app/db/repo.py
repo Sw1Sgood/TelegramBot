@@ -1,10 +1,10 @@
 from datetime import datetime, timezone
 from typing import Any
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Event, Reading, Referral, Subscription, User
+from app.db.models import Credit, Event, Reading, Referral, Subscription, User
 
 
 async def get_user(session: AsyncSession, user_id: int) -> User | None:
@@ -76,3 +76,34 @@ async def has_active_subscription(session: AsyncSession, user_id: int, now: date
         ).limit(1)
     )
     return result.first() is not None
+
+
+async def get_credits(session: AsyncSession, user_id: int) -> int:
+    credit = await session.get(Credit, user_id)
+    return credit.balance if credit else 0
+
+
+async def add_credits(session: AsyncSession, user_id: int, amount: int) -> None:
+    credit = await session.get(Credit, user_id)
+    if credit is None:
+        session.add(Credit(user_id=user_id, balance=amount))
+    else:
+        credit.balance += amount
+    await session.flush()
+
+
+async def consume_credit(session: AsyncSession, user_id: int) -> bool:
+    """Списывает один бонусный расклад; False — если их нет."""
+    result = await session.execute(
+        update(Credit).where(Credit.user_id == user_id, Credit.balance > 0).values(balance=Credit.balance - 1)
+    )
+    return result.rowcount > 0
+
+
+async def referral_stats(session: AsyncSession, referrer_id: int) -> tuple[int, int]:
+    """(сколько друзей пришло, скольким из них уже начислен бонус)."""
+    result = await session.execute(
+        select(func.count(Referral.id), func.count(Referral.rewarded_at)).where(Referral.referrer_id == referrer_id)
+    )
+    invited, rewarded = result.one()
+    return int(invited), int(rewarded)
