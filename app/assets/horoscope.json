@@ -1,0 +1,154 @@
+{
+  "ru": {
+    "mood": [
+      "Энергии сейчас много — направь её на то, что действительно важно.",
+      "Хорошее время замедлиться и прислушаться к себе.",
+      "Вокруг больше лёгкости, чем кажется: позволь себе улыбнуться неожиданностям.",
+      "Период подходит для того, чтобы навести порядок в мыслях и планах.",
+      "Возможны маленькие приятные сюрпризы — замечай их.",
+      "Интуиция обострена: первое впечатление окажется верным.",
+      "Может захотеться перемен — начни с малого, например с новой привычки.",
+      "Спокойный ритм принесёт больше, чем суета.",
+      "Ты притягиваешь интересных людей и идеи — будь открыт.",
+      "Время завершать начатое и освобождать место для нового.",
+      "Настроение может меняться — будь к себе мягче.",
+      "Звёзды поддерживают смелые решения, если они идут от сердца."
+    ],
+    "love": [
+      "Искренний разговор сблизит тебя с любимым человеком.",
+      "Одиноким звёзды советуют чаще бывать там, где тебе по-настоящему интересно.",
+      "Маленький знак внимания скажет больше громких слов.",
+      "Старые недопонимания можно мягко прояснить.",
+      "Хорошее время для романтики и совместных планов.",
+      "Не торопи события: чувствам нужно время.",
+      "Кто-то из прошлого может напомнить о себе — реши, нужен ли он в настоящем.",
+      "Доверие сейчас важнее страсти.",
+      "Позволь себе принимать заботу, а не только дарить её.",
+      "Лёгкий флирт поднимет настроение и добавит уверенности.",
+      "Обрати внимание на того, кто давно рядом и поддерживает тебя.",
+      "Честность с собой подскажет, чего ты ждёшь от отношений."
+    ],
+    "work": [
+      "Удачное время для новых задач и смелых предложений.",
+      "Сосредоточься на одном важном деле — так результат будет заметнее.",
+      "Не спеши с крупными тратами: дай себе время подумать.",
+      "Совет опытного коллеги или друга окажется ценным.",
+      "Хорошо идут дела, требующие внимания к деталям.",
+      "Можно ждать признания своих усилий.",
+      "Подходящий момент, чтобы научиться чему-то новому.",
+      "Наведи порядок в финансах — это даст ощущение опоры.",
+      "Командная работа принесёт больше, чем попытки сделать всё самому.",
+      "Неожиданная идея может стать началом интересного проекта.",
+      "Береги силы: выгорание сейчас ни к чему.",
+      "Небольшой доход или выгода могут прийти с неожиданной стороны."
+    ],
+    "advice": [
+      "Выдели время для себя — хотя бы полчаса тишины.",
+      "Запиши три вещи, за которые ты благодарен.",
+      "Скажи «нет» тому, что забирает силы без пользы.",
+      "Сделай то, что давно откладываешь, — станет легче.",
+      "Прогуляйся без телефона и просто понаблюдай за миром.",
+      "Позвони человеку, по которому скучаешь.",
+      "Доверься своему темпу и не сравнивай себя с другими.",
+      "Начни день с маленькой радости.",
+      "Отпусти то, что не можешь изменить.",
+      "Порадуй себя чем-то приятным — без повода.",
+      "Будь честен в словах и мягок в тоне.",
+      "Поставь одну цель и отметь даже маленький прогресс."
+    ],
+    "element": {
+      "fire": ["Твоя огненная натура просит действия — дай ей выход.", "Огонь внутри горит ярко: зажигай других, но не обжигай."],
+      "earth": ["Твоя земная натура ценит надёжность — опирайся на проверенное.", "Практичность сейчас твоя суперсила."],
+      "air": ["Твоя воздушная натура жаждет общения — делись идеями.", "Лёгкость мысли поможет найти нестандартное решение."],
+      "water": ["Твоя водная натура чувствует глубже других — доверяй этому.", "Эмоции — твой компас, следуй за ними бережно."]
+    },
+    "month_theme": [
+      "Тема месяца — новые начала и смелые шаги.",
+      "Тема месяца — гармония в отношениях.",
+      "Тема месяца — порядок, планы и стабильность.",
+      "Тема месяца — творчество и самовыражение.",
+      "Тема месяца — забота о себе и восстановление.",
+      "Тема месяца — рост и обучение.",
+      "Тема месяца — завершение старого и освобождение.",
+      "Тема месяца — финансы и ресурсы."
+    ],
+    "colors": ["красный", "золотой", "изумрудный", "небесно-голубой", "фиолетовый", "белый", "серебристый", "бирюзовый", "оранжевый", "нежно-розовый"],
+    "weekdays": ["понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье"]
+  },
+  "en": {
+    "mood": [
+      "You have plenty of energy — direct it toward what truly matters.",
+      "A good time to slow down and listen to yourself.",
+      "There's more lightness around than it seems: let yourself smile at surprises.",
+      "This period is good for putting your thoughts and plans in order.",
+      "Small pleasant surprises are possible — notice them.",
+      "Your intuition is sharp: first impressions will prove right.",
+      "You may crave change — start small, like a new habit.",
+      "A calm rhythm will bring more than rushing around.",
+      "You attract interesting people and ideas — stay open.",
+      "Time to finish what you started and make room for something new.",
+      "Your mood may shift — be gentler with yourself.",
+      "The stars support bold decisions that come from the heart."
+    ],
+    "love": [
+      "A sincere conversation will bring you closer to someone you love.",
+      "If you're single, the stars suggest spending time where you're genuinely interested.",
+      "A small gesture of attention will say more than big words.",
+      "Old misunderstandings can be gently cleared up.",
+      "A good time for romance and shared plans.",
+      "Don't rush things: feelings need time.",
+      "Someone from the past may reach out — decide if they belong in your present.",
+      "Trust matters more than passion right now.",
+      "Allow yourself to receive care, not only give it.",
+      "A little flirting will lift your mood and confidence.",
+      "Notice the person who has long been by your side supporting you.",
+      "Being honest with yourself will show what you want from a relationship."
+    ],
+    "work": [
+      "A good time for new tasks and bold proposals.",
+      "Focus on one important task — the result will be more visible.",
+      "Don't rush into big purchases: give yourself time to think.",
+      "Advice from an experienced colleague or friend will be valuable.",
+      "Detail-oriented work goes especially well.",
+      "Your efforts may be recognised.",
+      "A good moment to learn something new.",
+      "Put your finances in order — it will give you a sense of stability.",
+      "Teamwork will bring more than trying to do everything yourself.",
+      "An unexpected idea could start an interesting project.",
+      "Save your energy: burnout won't help now.",
+      "A small gain may come from an unexpected direction."
+    ],
+    "advice": [
+      "Set aside time for yourself — even half an hour of quiet.",
+      "Write down three things you're grateful for.",
+      "Say no to what drains you without purpose.",
+      "Do the thing you've been putting off — you'll feel lighter.",
+      "Take a walk without your phone and simply observe the world.",
+      "Call someone you miss.",
+      "Trust your own pace and don't compare yourself to others.",
+      "Start the day with a small joy.",
+      "Let go of what you can't change.",
+      "Treat yourself to something nice — no reason needed.",
+      "Be honest in your words and gentle in your tone.",
+      "Set one goal and celebrate even small progress."
+    ],
+    "element": {
+      "fire": ["Your fiery nature wants action — let it out.", "Your inner fire burns bright: inspire others, but don't burn them."],
+      "earth": ["Your earthy nature values reliability — lean on what's proven.", "Practicality is your superpower right now."],
+      "air": ["Your airy nature craves conversation — share your ideas.", "A light mind will help you find an unusual solution."],
+      "water": ["Your watery nature feels more deeply than others — trust that.", "Emotions are your compass; follow them gently."]
+    },
+    "month_theme": [
+      "Theme of the month: new beginnings and bold steps.",
+      "Theme of the month: harmony in relationships.",
+      "Theme of the month: order, plans and stability.",
+      "Theme of the month: creativity and self-expression.",
+      "Theme of the month: self-care and recovery.",
+      "Theme of the month: growth and learning.",
+      "Theme of the month: closing old chapters and letting go.",
+      "Theme of the month: finances and resources."
+    ],
+    "colors": ["red", "gold", "emerald", "sky blue", "violet", "white", "silver", "turquoise", "orange", "soft pink"],
+    "weekdays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+  }
+}

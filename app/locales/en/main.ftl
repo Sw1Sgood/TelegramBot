@@ -33,9 +33,122 @@ profile-ready =
     🔢 Your life path number is <b>{ $life_path }</b>
     <i>{ $life_path_description }</i>
 
-daily-card-teaser = 🃏 Your first Card of the Day is being shuffled — it will appear here very soon.
 
 welcome-back = Welcome back, { $name }! ✨
+
+## Readings
+
+daily-card-gift = 🎁 And here is your first Card of the Day — a gift for getting to know each other:
+shuffling = 🔮 Shuffling the deck…
+card-reversed = reversed
+position-past = Past
+position-present = Present
+position-future = Future
+daily-card-title = <b>🃏 Card of the Day — { $card }</b>
+daily-advice-label = ✨ Advice for today:
+daily-card-again = Today's card has already been drawn — here it is. A new one will be waiting for you tomorrow 🌅
+reading-question-title = 🔮 Question reading
+reading-intro = { $name }, here is what the cards show.
+advice-label = ✨ Advice:
+
+question-ask =
+    ❓ Ask the cards a question — send it in one message (up to { $max } characters).
+
+    Open questions work best:
+    • "What should I understand about our relationship?"
+    • "How should I approach the new job?"
+    • "What should I pay attention to this month?"
+question-too-long = Your question is a bit long — please shorten it to { $max } characters.
+rate-limited = One second, the cards are still being shuffled… Try again in a couple of seconds.
+queue-notice = Lots of people right now — you're in the queue, it will take up to a minute ⏳
+reading-error = Sorry, I couldn't make the reading 🙏 It wasn't counted — please try again a bit later.
+limit-question-free =
+    You've already had today's free reading 🌙
+
+    A new one will be waiting for you tomorrow. And very soon there will be a subscription with unlimited readings, weekly and monthly horoscopes and big spreads.
+limit-premium = That's enough readings for today — the cards need rest too 🌙 Come back tomorrow.
+paywall-teaser = 💫 Want to go deeper? A subscription is coming soon: unlimited readings, the Celtic Cross, compatibility and weekly and monthly horoscopes.
+premium-locked = 🔒 This section will be available with a subscription — coming very soon ✨
+btn-new-reading = 🔮 New reading
+
+crisis-response =
+    I'm so sorry you're going through this 💛 I won't do a reading for this — right now it's more important to have a real person by your side who can support and help you.
+
+    Please reach out — it's free and confidential:
+    • If you're in immediate danger, call your local emergency number (<b>112</b> in Europe, <b>911</b> in the US).
+    • Find a free helpline in your country at findahelpline.com.
+
+    You're not alone, and talking to someone is the right step.
+
+## Diary
+
+diary-title = 📖 Your reading diary. Tap a reading to open it:
+diary-empty = Your diary is empty for now — make your first reading ✨
+diary-daily-card = Card of the Day
+
+## Horoscope
+
+horo-choose = { $sign_emoji } Horoscope for <b>{ $sign }</b>. Choose a period:
+btn-horo-day = Today
+btn-horo-week = Week
+btn-horo-month = Month
+horo-title-day = <b>{ $sign_emoji } { $sign } — horoscope for today, { $date }</b>
+horo-title-week = <b>{ $sign_emoji } { $sign } — horoscope for the week { $start }–{ $end }</b>
+horo-title-month = <b>{ $sign_emoji } { $sign } — horoscope for { $month } { $year }</b>
+horo-mood = 🌤 Mood:
+horo-love = 💞 Love:
+horo-work = 💼 Work and money:
+horo-advice = ✨ Advice:
+horo-lucky-color = 🎨 Lucky colour: { $color }
+horo-lucky-number = 🍀 Lucky number: { $number }
+horo-lucky-day = 📅 Lucky day: { $day }
+horo-personal-day = 🔢 Your personal day number is <b>{ $number }</b>: { $meaning }
+horo-personal-month = 🔢 Your personal month number is <b>{ $number }</b>: { $meaning }
+
+personal-1 = a time to begin and take the initiative.
+personal-2 = a time for partnership, patience and diplomacy.
+personal-3 = a time for communication, creativity and joy.
+personal-4 = a time for work, order and plans.
+personal-5 = a time for change, freedom and new experiences.
+personal-6 = a time to care for loved ones and home.
+personal-7 = a time for reflection, study and rest.
+personal-8 = a time for goals, money and decisive steps.
+personal-9 = a time to finish things and let go.
+
+month-1 = January
+month-2 = February
+month-3 = March
+month-4 = April
+month-5 = May
+month-6 = June
+month-7 = July
+month-8 = August
+month-9 = September
+month-10 = October
+month-11 = November
+month-12 = December
+
+## Data for the AI (not shown to users)
+
+llm-profile =
+    About the person:
+    Name: { $name }
+    Zodiac sign: { $sign }
+    Life path number: { $life_path }
+llm-history-empty = No past readings.
+llm-history =
+    This person's past readings (for context):
+    { $items }
+llm-reading-type-daily = Card of the Day
+llm-reading-type-question = question reading
+llm-base-meaning = Base meaning
+llm-question = The person's question: "{ $question }"
+llm-question-task = Today is { $date }. Make a three-card reading for the question: past, present, future.
+llm-daily-task = Today is { $date }. This is the Card of the Day — one card for today. Write 60–120 words: what this card means for the person's day, ending with a paragraph starting "Advice:" with one short piece of advice. Don't repeat the card name at the start — it's already shown.
+llm-horoscope-task = Write a horoscope for { $sign } for { $period } ({ $start } – { $end }).
+llm-period-day = today
+llm-period-week = the week
+llm-period-month = the month
 
 ## Input errors
 

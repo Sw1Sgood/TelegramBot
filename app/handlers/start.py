@@ -2,7 +2,7 @@ from datetime import date, datetime, time
 from html import escape
 from zoneinfo import ZoneInfo
 
-from aiogram import F, Router
+from aiogram import Bot, F, Router
 from aiogram.filters import CommandObject, CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
@@ -10,10 +10,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings
 from app.filters import not_command
+from app.handlers.readings import deliver_daily_card
 from app.db.models import User
 from app.i18n import I18n, Translator
 from app.keyboards import LangCb, OnboardingCb, language_keyboard, main_menu, single_button
 from app.services import users
+from app.services.card_images import CardImages
+from app.services.readings import ReadingService
 from app.services.profile_input import InputError, parse_birth_date, parse_time, validate_city, validate_name
 from app.states import Onboarding
 from app.views import profile_ready_text
@@ -125,23 +128,39 @@ async def onboarding_skip_time(callback: CallbackQuery, state: FSMContext, t: Tr
 
 @router.message(Onboarding.birth_city, F.text, not_command)
 async def onboarding_birth_city(
-    message: Message, state: FSMContext, session: AsyncSession, user: User | None, t: Translator
+    message: Message,
+    state: FSMContext,
+    session: AsyncSession,
+    user: User | None,
+    t: Translator,
+    settings: Settings,
+    readings: ReadingService,
+    card_images: CardImages,
+    bot: Bot,
 ) -> None:
     try:
         city = validate_city(message.text)
     except InputError as error:
         await message.answer(t(error.code))
         return
-    await _finish(message, state, session, user, t, city)
+    await _finish(message, state, session, user, t, city, settings, readings, card_images, bot)
 
 
 @router.callback_query(Onboarding.birth_city, OnboardingCb.filter(F.action == "skip-city"))
 async def onboarding_skip_city(
-    callback: CallbackQuery, state: FSMContext, session: AsyncSession, user: User | None, t: Translator
+    callback: CallbackQuery,
+    state: FSMContext,
+    session: AsyncSession,
+    user: User | None,
+    t: Translator,
+    settings: Settings,
+    readings: ReadingService,
+    card_images: CardImages,
+    bot: Bot,
 ) -> None:
     await callback.answer()
     await callback.message.edit_reply_markup(reply_markup=None)
-    await _finish(callback.message, state, session, user, t, None)
+    await _finish(callback.message, state, session, user, t, None, settings, readings, card_images, bot)
 
 
 @router.message(StateFilter(Onboarding.name, Onboarding.birth_date, Onboarding.birth_time, Onboarding.birth_city), not_command)
@@ -167,6 +186,10 @@ async def _finish(
     user: User | None,
     t: Translator,
     city: str | None,
+    settings: Settings,
+    readings: ReadingService,
+    card_images: CardImages,
+    bot: Bot,
 ) -> None:
     data = await state.get_data()
     await state.clear()
@@ -184,9 +207,9 @@ async def _finish(
         birth_city=city,
     )
     await message.answer(profile_ready_text(t, user))
-    # Настоящая Карта дня появится на Этапе 2.
-    await message.answer(t("daily-card-teaser"))
-    await message.answer(t("main-menu-title"), reply_markup=main_menu(t))
+    # Первый «вау-момент» — сразу бесплатная Карта дня.
+    await message.answer(t("daily-card-gift"))
+    await deliver_daily_card(bot, message.chat.id, session, user, t, settings, readings, card_images)
 
 
 def _is_valid_name(text: str) -> bool:

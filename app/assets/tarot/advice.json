@@ -1,0 +1,46 @@
+{
+  "ru": {
+    "major": {
+      "up": ["Доверься большому движению, которое начинается в твоей жизни, — оно ведёт в верную сторону.", "Это важный момент: прислушайся к себе и действуй в согласии со своими ценностями.", "Сейчас тот случай, когда стоит сделать смелый шаг — Вселенная на твоей стороне."],
+      "rev": ["Не торопи события: дай себе время понять, что на самом деле происходит.", "Посмотри, где ты сопротивляешься переменам, и попробуй отпустить контроль.", "Начни с малого: один честный шаг сегодня важнее больших планов."]
+    },
+    "wands": {
+      "up": ["Действуй, пока горит огонь: начни то, о чём давно думаешь.", "Покажи свою энергию миру — сейчас она заразительна.", "Поставь цель и сделай к ней первый шаг уже сегодня."],
+      "rev": ["Береги силы: выбери одно главное дело вместо десяти.", "Сделай паузу и проверь, зажигает ли тебя то, чем ты занят.", "Не сжигай себя — отдых тоже часть пути."]
+    },
+    "cups": {
+      "up": ["Открой сердце и скажи близким, что ты чувствуешь.", "Позволь себе радость и нежность — ты их заслуживаешь.", "Доверься чувствам: они подскажут верное решение."],
+      "rev": ["Будь бережен к своим эмоциям и не требуй от себя слишком многого.", "Поговори с тем, кому доверяешь, — станет легче.", "Отпусти старую обиду, чтобы освободить место для нового."]
+    },
+    "swords": {
+      "up": ["Опирайся на факты и ясные мысли, а не на страхи.", "Скажи правду — мягко, но честно.", "Запиши свои мысли: на бумаге решение станет яснее."],
+      "rev": ["Не принимай решений в тревоге — сначала успокойся.", "Не верь всему, что подсказывает беспокойный ум.", "Позволь себе отдохнуть от размышлений и просто побыть в моменте."]
+    },
+    "pentacles": {
+      "up": ["Вкладывайся в то, что даёт долгий результат: навыки, полезные привычки, отношения.", "Сделай одно практичное дело, которое давно откладываешь.", "Цени то, что уже есть, — это прочный фундамент."],
+      "rev": ["Наведи порядок в делах и финансах — станет спокойнее.", "Не гонись за быстрым результатом: терпение окупится.", "Найди баланс между работой и отдыхом."]
+    }
+  },
+  "en": {
+    "major": {
+      "up": ["Trust the bigger movement starting in your life — it's leading you the right way.", "This is an important moment: listen to yourself and act in line with your values.", "This is a time to take a brave step — the universe is on your side."],
+      "rev": ["Don't rush things: give yourself time to understand what's really happening.", "Notice where you resist change and try to loosen your grip.", "Start small: one honest step today matters more than big plans."]
+    },
+    "wands": {
+      "up": ["Act while the fire burns: start what you've been thinking about.", "Show your energy to the world — right now it's contagious.", "Set a goal and take the first step toward it today."],
+      "rev": ["Save your strength: choose one main task instead of ten.", "Pause and check whether what you're doing still excites you.", "Don't burn out — rest is part of the journey too."]
+    },
+    "cups": {
+      "up": ["Open your heart and tell your loved ones how you feel.", "Allow yourself joy and tenderness — you deserve them.", "Trust your feelings: they'll point to the right decision."],
+      "rev": ["Be gentle with your emotions and don't ask too much of yourself.", "Talk to someone you trust — it will feel lighter.", "Let go of an old hurt to make room for something new."]
+    },
+    "swords": {
+      "up": ["Rely on facts and clear thinking, not on fears.", "Speak the truth — gently but honestly.", "Write your thoughts down: the answer gets clearer on paper."],
+      "rev": ["Don't make decisions while anxious — calm down first.", "Don't believe everything a restless mind tells you.", "Take a break from overthinking and simply be in the moment."]
+    },
+    "pentacles": {
+      "up": ["Invest in what pays off long term: skills, healthy habits, relationships.", "Do one practical thing you've been putting off.", "Value what you already have — it's a solid foundation."],
+      "rev": ["Put your affairs and finances in order — you'll feel calmer.", "Don't chase quick results: patience will pay off.", "Find a balance between work and rest."]
+    }
+  }
+}

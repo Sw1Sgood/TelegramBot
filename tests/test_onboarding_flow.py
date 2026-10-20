@@ -43,8 +43,10 @@ async def test_full_onboarding(harness: BotHarness, sessionmaker: async_sessionm
     texts = await harness.send("Москва")
     assert "Твой знак зодиака — <b>Овен</b>" in texts[0]
     assert "Число жизненного пути — <b>7</b>" in texts[0]
-    assert "Карта дня" in texts[1]
-    assert "Главное меню" in texts[2]
+    assert "первая Карта дня" in texts[1]
+    assert texts[2] == "🔮 Тасую колоду…"
+    assert "<b>🃏 Карта дня — " in texts[3]
+    assert "Совет дня:" in texts[3]
 
     user = await _get_user(sessionmaker, 1)
     assert user is not None
@@ -153,6 +155,6 @@ async def test_delete_me_removes_everything(harness: BotHarness, sessionmaker: a
 async def test_coming_soon_sections(harness: BotHarness) -> None:
     await _onboard(harness)
     harness.session.clear()
-    await harness.press(MenuCb(section="horoscope").pack())
+    await harness.press(MenuCb(section="spreads").pack())
     answers = [r for r in harness.session.requests if type(r).__name__ == "AnswerCallbackQuery"]
     assert answers[0].text == "✨ Этот раздел появится совсем скоро!"

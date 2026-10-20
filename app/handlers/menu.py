@@ -27,6 +27,14 @@ async def menu_main(callback: CallbackQuery, state: FSMContext, t: Translator) -
     await callback.message.edit_text(t("main-menu-title"), reply_markup=main_menu(t))
 
 
+@router.callback_query(MenuCb.filter(F.section == "main-new"))
+async def menu_main_new(callback: CallbackQuery, state: FSMContext, t: Translator) -> None:
+    # Меню новым сообщением — чтобы не затирать текст расклада.
+    await state.clear()
+    await callback.answer()
+    await callback.message.answer(t("main-menu-title"), reply_markup=main_menu(t))
+
+
 @router.callback_query(MenuCb.filter(F.section == "profile"))
 async def menu_profile(callback: CallbackQuery, state: FSMContext, user: User | None, t: Translator) -> None:
     await state.clear()

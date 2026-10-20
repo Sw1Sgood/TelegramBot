@@ -11,3 +11,7 @@ class Onboarding(StatesGroup):
 
 class ProfileEdit(StatesGroup):
     value = State()
+
+
+class ReadingFlow(StatesGroup):
+    question = State()

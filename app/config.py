@@ -28,6 +28,26 @@ class Settings(BaseSettings):
     default_timezone: str = "Europe/Moscow"
     default_daily_card_time: time = time(9, 0)
 
+    # ИИ-трактовки. Без ключа бот пишет трактовки из готовых текстов.
+    anthropic_api_key: SecretStr = SecretStr("")
+    llm_model: str = "claude-haiku-5-5"
+    llm_timeout_seconds: float = 30.0
+    llm_max_retries: int = 2
+    llm_max_concurrency: int = 50
+    # Цены модели за 1 млн токенов, $ — для учёта расходов.
+    llm_price_input_per_mtok: float = 0.10
+    llm_price_output_per_mtok: float = 0.50
+    # Дневной бюджет на ИИ, $. При превышении бесплатные расклады идут на готовых текстах.
+    llm_daily_budget_usd: float = 5.0
+
+    # Лимиты раскладов.
+    free_questions_per_day: int = 1
+    premium_readings_per_day: int = 30
+    llm_rate_limit_seconds: int = 5
+    question_max_length: int = 500
+    # Открыть всем платные разделы (для демо, пока нет оплаты).
+    premium_for_all: bool = False
+
     admin_ids: Annotated[list[int], NoDecode] = []
     log_level: str = "INFO"
 

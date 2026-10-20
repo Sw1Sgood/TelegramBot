@@ -8,8 +8,9 @@ import pytest
 from aiogram import Bot, Router
 from aiogram.client.session.base import BaseSession
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.methods import GetMe, SendMessage, TelegramMethod
-from aiogram.types import CallbackQuery, Chat, Message, Update, User as TgUser
+from aiogram.methods import GetMe, SendMediaGroup, SendMessage, SendPhoto, TelegramMethod
+from aiogram.types import CallbackQuery, Chat, Message, PhotoSize, Update, User as TgUser
+from fakeredis.aioredis import FakeRedis
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from app.bot import build_dispatcher
@@ -31,13 +32,27 @@ class RecordingSession(BaseSession):
         if isinstance(method, GetMe):
             return TgUser(id=42, is_bot=True, first_name="Bot", username="test_bot")
         if isinstance(method, SendMessage):
-            return Message(
-                message_id=next(self._ids),
-                date=datetime.now(timezone.utc),
-                chat=Chat(id=int(method.chat_id), type="private"),
-                text=method.text,
-            )
+            return self._message(method.chat_id, text=method.text)
+        if isinstance(method, SendPhoto):
+            return self._message(method.chat_id, photo=[self._photo()])
+        if isinstance(method, SendMediaGroup):
+            return [self._message(method.chat_id, photo=[self._photo()]) for _ in method.media]
         return True
+
+    def _message(self, chat_id: int | str, **kwargs: Any) -> Message:
+        return Message(
+            message_id=next(self._ids),
+            date=datetime.now(timezone.utc),
+            chat=Chat(id=int(chat_id), type="private"),
+            **kwargs,
+        )
+
+    def _photo(self) -> PhotoSize:
+        n = next(self._ids)
+        return PhotoSize(file_id=f"photo-{n}", file_unique_id=f"u-{n}", width=500, height=860)
+
+    def of_type(self, name: str) -> list[TelegramMethod[Any]]:
+        return [request for request in self.requests if type(request).__name__ == name]
 
     async def close(self) -> None:
         pass
@@ -79,7 +94,8 @@ class BotHarness:
     def __init__(self, settings: Settings, sessionmaker: async_sessionmaker[AsyncSession]) -> None:
         self.session = RecordingSession()
         self.bot = Bot("42:TEST", session=self.session)
-        self.dp, _ = build_dispatcher(settings, MemoryStorage(), sessionmaker)
+        self.redis = FakeRedis()
+        self.dp, _ = build_dispatcher(settings, MemoryStorage(), sessionmaker, self.redis, self.bot.id)
         self._update_ids = count(1)
         self._message_ids = count(1)
 

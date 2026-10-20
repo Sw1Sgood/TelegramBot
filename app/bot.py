@@ -18,6 +18,11 @@ from app.db.base import create_engine, create_sessionmaker
 from app.handlers import setup_routers
 from app.i18n import I18n
 from app.middlewares import ContextMiddleware
+from app.services.card_images import CardImages
+from app.services.horoscope import HoroscopeService
+from app.services.limits import Limiter
+from app.services.llm import LLM
+from app.services.readings import ReadingService
 
 logger = logging.getLogger(__name__)
 
@@ -43,10 +48,23 @@ async def setup_bot_profile(bot: Bot, i18n: I18n, settings: Settings) -> None:
 
 
 def build_dispatcher(
-    settings: Settings, storage: BaseStorage, sessionmaker: async_sessionmaker[AsyncSession]
+    settings: Settings,
+    storage: BaseStorage,
+    sessionmaker: async_sessionmaker[AsyncSession],
+    redis: Redis,
+    bot_id: int,
 ) -> tuple[Dispatcher, I18n]:
     i18n = I18n(default_locale=settings.default_language, global_args={"bot_name": settings.bot_name})
-    dp = Dispatcher(storage=storage, settings=settings)
+    llm = LLM(settings, redis)
+    dp = Dispatcher(
+        storage=storage,
+        settings=settings,
+        llm=llm,
+        limiter=Limiter(redis),
+        readings=ReadingService(settings, llm),
+        horoscopes=HoroscopeService(llm, redis),
+        card_images=CardImages(redis, bot_id),
+    )
     dp.update.outer_middleware(ContextMiddleware(sessionmaker, i18n, settings))
     dp.include_router(setup_routers())
     return dp, i18n
@@ -58,8 +76,11 @@ async def main() -> None:
 
     bot = Bot(settings.bot_token.get_secret_value(), default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     engine = create_engine(settings.database_url)
-    storage = RedisStorage(Redis.from_url(settings.redis_url))
-    dp, i18n = build_dispatcher(settings, storage, create_sessionmaker(engine))
+    redis = Redis.from_url(settings.redis_url)
+    storage = RedisStorage(redis)
+    dp, i18n = build_dispatcher(settings, storage, create_sessionmaker(engine), redis, bot.id)
+    if not settings.anthropic_api_key.get_secret_value():
+        logger.info("ANTHROPIC_API_KEY is not set: readings use built-in texts")
 
     async def on_shutdown() -> None:
         await engine.dispose()

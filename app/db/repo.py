@@ -4,7 +4,7 @@ from typing import Any
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Event, Referral, User
+from app.db.models import Event, Reading, Referral, Subscription, User
 
 
 async def get_user(session: AsyncSession, user_id: int) -> User | None:
@@ -37,3 +37,42 @@ async def get_referral_by_referred(session: AsyncSession, referred_id: int) -> R
 
 async def log_event(session: AsyncSession, user_id: int | None, name: str, payload: dict[str, Any] | None = None) -> None:
     session.add(Event(user_id=user_id, name=name, payload=payload, created_at=datetime.now(timezone.utc)))
+
+
+async def add_reading(session: AsyncSession, reading: Reading) -> Reading:
+    session.add(reading)
+    await session.flush()
+    return reading
+
+
+async def recent_readings(session: AsyncSession, user_id: int, limit: int) -> list[Reading]:
+    result = await session.execute(
+        select(Reading).where(Reading.user_id == user_id).order_by(Reading.created_at.desc(), Reading.id.desc()).limit(limit)
+    )
+    return list(result.scalars())
+
+
+async def get_reading(session: AsyncSession, user_id: int, reading_id: int) -> Reading | None:
+    result = await session.execute(select(Reading).where(Reading.id == reading_id, Reading.user_id == user_id))
+    return result.scalar_one_or_none()
+
+
+async def find_reading_between(
+    session: AsyncSession, user_id: int, reading_type: str, start: datetime, end: datetime
+) -> Reading | None:
+    result = await session.execute(
+        select(Reading)
+        .where(Reading.user_id == user_id, Reading.type == reading_type, Reading.created_at >= start, Reading.created_at < end)
+        .order_by(Reading.created_at.desc())
+        .limit(1)
+    )
+    return result.scalar_one_or_none()
+
+
+async def has_active_subscription(session: AsyncSession, user_id: int, now: datetime) -> bool:
+    result = await session.execute(
+        select(Subscription.id).where(
+            Subscription.user_id == user_id, Subscription.status.in_(("active", "cancelled")), Subscription.expires_at > now
+        ).limit(1)
+    )
+    return result.first() is not None
